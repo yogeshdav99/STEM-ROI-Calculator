@@ -10,7 +10,7 @@ def render():
     """
     
     # Dynamically load the profile picture as base64 to inject securely into the HTML iframe
-    avatar_html = '<div class="avatar-img">👨‍💻</div>'
+    avatar_html = '<div class="avatar-img"><i class="fas fa-user-tie"></i></div>'
     for ext in ['png', 'jpg', 'jpeg', 'webp']:
         img_path = os.path.join("img", f"yogesh_pfp.{ext}")
         if os.path.exists(img_path):
@@ -162,7 +162,7 @@ def render():
     <body>
 
     <div class="particles" id="particles"></div>
-    <div class="toast" id="toast">🏆 Achievement Unlocked: Chief Caffeine Officer ☕</div>
+    <div class="toast" id="toast">Achievement Unlocked: Chief Caffeine Officer</div>
 
     <div class="dev-wrapper">
         <!-- Profile Card -->
@@ -187,23 +187,23 @@ def render():
         <!-- Support Card -->
         <div class="glass-card">
             <div class="coffee-content">
-                <div class="coffee-cup-container" id="coffee-btn" title="Click me 5 times!">
-                    <div class="steam steam-1">♨️</div>
-                    <div class="steam steam-2">♨️</div>
-                    <div class="coffee-cup">☕</div>
+                <div class="coffee-cup-container" style="color: var(--coffee-gold); font-size: 3rem; margin-bottom: 2rem;" id="coffee-btn" title="Click me 5 times!">
+                    <div class="steam steam-1"><i class="fas fa-wind"></i></div>
+                    <div class="steam steam-2"><i class="fas fa-wind"></i></div>
+                    <div class="coffee-cup"><i class="fas fa-mug-hot"></i></div>
                 </div>
                 
-                <div class="rotating-msg" id="rotating-msg">This app runs on Python and caffeine ☕</div>
+                <div class="rotating-msg" id="rotating-msg">This app runs on Python and caffeine.</div>
                 
-                <button class="support-btn" id="support-btn" onclick="window.open('https://buymeacoffee.com/yogeshpatel', '_blank')">Buy Me a Coffee ☕</button>
+                <button class="support-btn" id="support-btn" onclick="window.open('https://buymeacoffee.com/yogeshpatel', '_blank')">Buy Me a Coffee</button>
 
                 <div class="legends-container">
                     <div class="legends-title">Developers Fueled</div>
                     <div class="counter-val" id="counter">0</div>
                     <div class="badges">
-                        <span class="badge" title="Gold Supporter">🥇</span>
-                        <span class="badge" title="Silver Supporter">🥈</span>
-                        <span class="badge" title="Bronze Supporter">🥉</span>
+                        <span class="badge" title="Gold Supporter"><i class="fas fa-medal" style="color: #ffd700;"></i></span>
+                        <span class="badge" title="Silver Supporter"><i class="fas fa-medal" style="color: #c0c0c0;"></i></span>
+                        <span class="badge" title="Bronze Supporter"><i class="fas fa-medal" style="color: #cd7f32;"></i></span>
                     </div>
                 </div>
             </div>
@@ -226,9 +226,9 @@ def render():
 
         // Funny Rotating Messages
         const msgs = [
-            "This app runs on Python and caffeine ☕",
-            "Every coffee adds +10 coding speed 🚀",
-            "Warning: Donations may result in more features 😄",
+            "This app runs on Python and caffeine.",
+            "Every coffee adds +10 coding speed.",
+            "Warning: Donations may result in more features.",
             "Powered by curiosity and espresso shots"
         ];
         let msgIdx = 0;
@@ -261,7 +261,7 @@ def render():
             for(let i=0; i<4; i++) {
                 let heart = document.createElement('div');
                 heart.className = 'heart';
-                heart.innerText = ['💙', '💜', '☕', '✨'][Math.floor(Math.random()*4)];
+                heart.innerText = ['+', '*', '·', '°'][Math.floor(Math.random()*4)];
                 heart.style.left = 20 + Math.random() * 60 + '%';
                 heart.style.bottom = '10px';
                 supportBtn.appendChild(heart);

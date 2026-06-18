@@ -4,11 +4,15 @@ import plotly.graph_objects as go
 from utils import calculate_roi_metrics, calculate_irr, STEM_DEGREES, STEM_JOBS, DEGREE_JOB_MAPPING, run_monte_carlo_roi
 
 def render(true_economic_cost_local, currency_symbol, exchange_rate):
-    st.header("Career & ROI Forecaster")
-    st.markdown("Compare two different post-graduation career tracks side-by-side. See how quickly you can pay off your loans and build actual wealth.")
+    st.markdown("### Career & ROI Forecaster")
     
-    st.markdown("#### Financial Settings")
-    discount_rate = st.slider("Discount Rate (Inflation & Risk %)", min_value=1.0, max_value=15.0, value=7.0, step=0.5, help="This accounts for inflation and investment risk. Money tomorrow is worth less than money today.")
+    col_text, col_slider = st.columns([1.5, 1], gap="large")
+    with col_text:
+        st.markdown("Compare two different post-graduation career tracks side-by-side. See how quickly you can pay off your loans and build actual wealth.")
+    with col_slider:
+        discount_rate = st.slider("Discount Rate (Inflation & Risk %)", min_value=1.0, max_value=15.0, value=7.0, step=0.5, help="This accounts for inflation and investment risk. Money tomorrow is worth less than money today.")
+        
+    st.session_state.discount_rate = discount_rate
     st.divider()
     
     @st.cache_data
@@ -44,44 +48,49 @@ def render(true_economic_cost_local, currency_symbol, exchange_rate):
     sub_tab_a, sub_tab_b = st.tabs(["Scenario A", "Scenario B"])
     
     def render_scenario_ui(scenario_key: str, default_country_idx: int, discount_rate: float):
-        col_sel1, col_sel2 = st.columns(2)
-        with col_sel1: degree_level = st.selectbox(f"Degree Level ({scenario_key})", options=["Bachelor's", "Master's", "PhD"], index=1, key=f"deg_{scenario_key}")
-        with col_sel2: stream = st.selectbox(f"Degree / Stream ({scenario_key})", options=STEM_DEGREES, index=None, placeholder="e.g. Mechanical Engineering", key=f"stream_{scenario_key}")
-        
-        available_jobs = DEGREE_JOB_MAPPING.get(stream, STEM_JOBS) if stream else STEM_JOBS
-        
-        col_sel3, col_sel4 = st.columns(2)
-        with col_sel3: role = st.selectbox(f"Target Job ({scenario_key})", options=available_jobs, index=None, placeholder="e.g. Mechanical Engineer", key=f"role_{scenario_key}")
-        with col_sel4: country = st.selectbox(f"Target Country ({scenario_key})", options=df_careers["Country"].unique(), index=default_country_idx, key=f"country_{scenario_key}")
+        left_panel, right_panel = st.columns([1, 1.3], gap="large")
             
-        country_data = df_careers[df_careers["Country"] == country].iloc[0]
-        display_role = role if role else "STEM Professional"
-        display_stream = f" ({stream})" if stream else ""
-        
-        # Match against specific career defaults in the selected country, fallback to global role average or country average
-        match = df_defaults.copy()
-        if "Country" in match.columns:
-            match = match[(match["Job_Title"] == role) & (match["Degree_Level"] == degree_level) & (match["Country"] == country)]
-            if match.empty:
-                match = df_defaults[(df_defaults["Job_Title"] == role) & (df_defaults["Degree_Level"] == degree_level)]
-        else:
-            match = match[(match["Job_Title"] == role) & (match["Degree_Level"] == degree_level)]
+        with left_panel:
+            col_sel1, col_sel2 = st.columns(2)
+            with col_sel1: degree_level = st.selectbox(f"Degree Level ({scenario_key})", options=["Bachelor's", "Master's", "PhD"], index=0, key=f"deg_{scenario_key}")
+            with col_sel2: stream = st.selectbox(f"Degree / Stream ({scenario_key})", options=STEM_DEGREES, index=None, placeholder="e.g. Mechanical Engineering", key=f"stream_{scenario_key}")
             
-        base_salary_usd = match.iloc[0]["Starting_Salary_USD"] if not match.empty else country_data['Average_STEM_Salary_USD']
-        source_text = f"Source: [{match.iloc[0]['Source_Name']}]({match.iloc[0]['Source_URL']})" if not match.empty else "Source: Baseline Country Estimate"
-        
-        local_salary = base_salary_usd * exchange_rate
-        
-        with st.container(border=True):
-            st.markdown(f"#### Profile: {display_role}{display_stream} in {country}")
+            available_jobs = DEGREE_JOB_MAPPING.get(stream, STEM_JOBS) if stream else STEM_JOBS
             
-            col_over1, col_over2 = st.columns(2)
-            with col_over1: 
-                custom_salary_local = st.number_input(f"Override Starting Salary ({currency_symbol})", value=float(local_salary), step=5_000.0, help=f"Base Reference: ${base_salary_usd:,.0f} USD", key=f"custom_salary_{scenario_key}")
-                st.caption(f"*{source_text}*")
-            with col_over2: custom_growth_rate = st.number_input("Override Expected Growth Rate (%)", value=float(country_data['Growth_Rate_Pct']), step=0.5, help="Expected annual salary increase.", key=f"custom_growth_{scenario_key}")
+            col_sel3, col_sel4 = st.columns(2)
+            with col_sel3: role = st.selectbox(f"Target Job ({scenario_key})", options=available_jobs, index=None, placeholder="e.g. Mechanical Engineer", key=f"role_{scenario_key}")
+            with col_sel4: country = st.selectbox(f"Target Country ({scenario_key})", options=df_careers["Country"].unique(), index=default_country_idx, key=f"country_{scenario_key}")
                 
-            st.divider()
+            country_data = df_careers[df_careers["Country"] == country].iloc[0]
+            display_role = role if role else "STEM Professional"
+            display_stream = f" ({stream})" if stream else ""
+            
+            # Match against specific career defaults in the selected country, fallback to global role average or country average
+            match = df_defaults.copy()
+            if "Country" in match.columns:
+                match = match[(match["Job_Title"] == role) & (match["Degree_Level"] == degree_level) & (match["Country"] == country)]
+                if match.empty:
+                    match = df_defaults[(df_defaults["Job_Title"] == role) & (df_defaults["Degree_Level"] == degree_level)]
+            else:
+                match = match[(match["Job_Title"] == role) & (match["Degree_Level"] == degree_level)]
+                
+            base_salary_usd = match.iloc[0]["Starting_Salary_USD"] if not match.empty else country_data['Average_STEM_Salary_USD']
+            source_text = f"Source: [{match.iloc[0]['Source_Name']}]({match.iloc[0]['Source_URL']})" if not match.empty else "Source: Baseline Country Estimate"
+            
+            local_salary = base_salary_usd * exchange_rate
+            
+            with st.container(border=True):
+                st.markdown(f"#### Profile: {display_role}{display_stream} in {country}")
+                
+                col_over1, col_over2 = st.columns(2)
+                with col_over1: 
+                    custom_salary_local = st.number_input(f"Override Starting Salary ({currency_symbol})", value=int(local_salary), step=5000, help=f"Base Reference: ${base_salary_usd:,.0f} USD", key=f"custom_salary_{scenario_key}")
+                    st.session_state[f"saved_salary_{scenario_key}"] = custom_salary_local
+                    st.caption(f"*{source_text}*")
+                with col_over2: 
+                    custom_growth_rate = st.number_input("Override Expected Growth Rate (%)", value=float(country_data['Growth_Rate_Pct']), step=0.5, help="Expected annual salary increase.", key=f"custom_growth_{scenario_key}")
+                    st.session_state[f"saved_growth_{scenario_key}"] = custom_growth_rate
+                    
             st.markdown("#### Visa & Immigration Realities")
             st.markdown(f"**Immigration Route:** {country_data['Visa_Route']}")
             
@@ -91,34 +100,28 @@ def render(true_economic_cost_local, currency_symbol, exchange_rate):
             
             if friction >= 8: st.error(f"**High Risk:** The {country_data['Visa_Route']} has high barriers (e.g., lotteries, caps). Note for Indian Students: You face severe backlogs (often decades) for permanent residency/Green Cards in countries like the US. Factor this stress into your decision!")
             elif friction >= 5: st.warning(f"**Moderate Risk:** The {country_data['Visa_Route']} is viable but requires finding an employer willing to sponsor you or meeting strict points criteria. Start networking early!")
-            else: st.success(f"**Low Risk:** The {country_data['Visa_Route']} is highly structured and relatively accessible for Master's graduates, offering a clear pathway to post-study work and PR.")
+            else: st.success(f"**Low Risk:** The {country_data['Visa_Route']} is highly structured and relatively accessible for international graduates, offering a clear pathway to post-study work and PR.")
                 
-            st.divider()
+        npv_local, break_even, cash_flows = calculate_roi_metrics(starting_salary=custom_salary_local, growth_rate=custom_growth_rate, discount_rate=discount_rate, year_0_cost=true_economic_cost_local)
+        irr_value = calculate_irr(cash_flows)
+            
+        with right_panel:
             st.markdown("#### 10-Year Wealth Projection")
-            npv_local, break_even, cash_flows = calculate_roi_metrics(starting_salary=custom_salary_local, growth_rate=custom_growth_rate, discount_rate=discount_rate, year_0_cost=true_economic_cost_local)
-            irr_value = calculate_irr(cash_flows)
             
-            roi_col1, roi_col2, roi_col3 = st.columns(3)
-            with roi_col1: st.metric("10-Year Net Value (NPV)", f"{currency_symbol}{npv_local:,.0f}", help="Net Present Value (NPV): We take all the extra money you'll make over 10 years, subtract the cost of the degree, and reduce it to account for inflation. A positive number means this degree creates real wealth!")
-            with roi_col2:
-                be_text = f"Year {break_even}" if break_even else "10+ Years"
-                st.metric("Break-Even Point", be_text, help="The exact year after graduation when your cumulative earnings finally cover the total upfront cost of your degree. Lower is better!")
-            with roi_col3: st.metric("Internal Rate of Return (IRR)", f"{irr_value:.1f}%", help="IRR treats your degree like a financial asset. If your IRR is 15%, it's like your education investment pays you a 15% return every year for 10 years. Compare this to the stock market (~8%)!")
+            roi_col1, roi_col2 = st.columns(2)
+            with roi_col1: st.metric("10-Year Net Value (NPV)", f"{currency_symbol}{npv_local:,.0f}", help="Net Present Value (NPV): We take all the extra money you'll make over 10 years, subtract the cost of the degree, and reduce it to account for inflation.")
+            with roi_col2: st.metric("Internal Rate of Return (IRR)", f"{irr_value:.1f}%", help="IRR treats your degree like a financial asset. Compare this to the stock market (~8%)!")
             
-            with st.expander("View Year-by-Year Breakdown"):
+            be_text = f"Year {break_even}" if break_even else "10+ Years"
+            st.metric("Break-Even Point", be_text, help="The exact year after graduation when your cumulative earnings finally cover the total upfront cost of your degree.")
+            
+            with st.expander("Year-by-Year Breakdown"):
                 df_cf = pd.DataFrame({"Year": ["Year 0 (Cost)"] + [f"Year {i}" for i in range(1, 11)], "Cash Flow": [f"{currency_symbol}{cf:,.0f}" for cf in cash_flows]})
                 st.dataframe(df_cf, hide_index=True, use_container_width=True)
 
-            with st.expander("**What do NPV and Break-Even mean?**"):
-                st.markdown("""
-                * **Net Value Created (NPV):** We take all the extra money you'll make over 10 years, subtract the massive cost of the degree, and adjust it downwards to account for inflation (since money tomorrow buys less than money today).
-                * **Break-Even Point:** The exact year where the cumulative money you've made after graduation finally covers the total upfront cost of your degree. 
-                """)
-
             with st.expander("**Two-Way Sensitivity Matrix**"):
-                st.markdown("Consultants use **Sensitivity Analysis** to see how value changes when core assumptions shift. This matrix shows your NPV if your starting salary and growth rates change by ±10%.")
+                st.markdown("This matrix shows your NPV if your starting salary and growth rates change by ±10%.")
                 
-                # Generate base variations (Base, -10%, +10%)
                 salaries = [custom_salary_local * 0.9, custom_salary_local, custom_salary_local * 1.1]
                 growths = [custom_growth_rate - 1.5, custom_growth_rate, custom_growth_rate + 1.5]
                 
@@ -132,32 +135,8 @@ def render(true_economic_cost_local, currency_symbol, exchange_rate):
                 
                 df_sens = pd.DataFrame(matrix, columns=[f"Growth {g:.1f}%" for g in growths], index=[f"Salary {currency_symbol}{s:,.0f}" for s in salaries])
                 st.dataframe(df_sens, use_container_width=True)
-                
-            st.divider()
-            st.markdown("#### Advanced Risk Analysis (Monte Carlo)")
-            st.markdown("Real-world careers aren't perfect straight lines. This engine simulates **1,000 alternate realities** (factor in recessions, promotions, and market volatility) to determine the statistical probability that your degree actually pays off.")
-            
-            if st.button("Run 1,000 Career Simulations", key=f"mc_btn_{scenario_key}"):
-                mc_results = run_monte_carlo_roi(custom_salary_local, custom_growth_rate, discount_rate, true_economic_cost_local)
-                
-                mc_col1, mc_col2, mc_col3 = st.columns(3)
-                with mc_col1: st.metric("Probability of Profit", f"{mc_results['prob_positive']:.1f}%", help="The percentage of simulated lifetimes where you make more money than the degree cost.")
-                with mc_col2: st.metric("Worst Case Scenario (Bottom 5%)", f"{currency_symbol}{mc_results['worst_case_5th']:,.0f}", help="If the economy tanks, this is your likely financial outcome.", delta="High Risk", delta_color="inverse")
-                with mc_col3: st.metric("Best Case Scenario (Top 5%)", f"{currency_symbol}{mc_results['best_case_95th']:,.0f}", help="If you get aggressive promotions, this is your upside.")
-                
-                fig_mc = go.Figure(data=[go.Histogram(x=mc_results['npvs'], nbinsx=50, marker_color='#4F46E5', opacity=0.75)])
-                fig_mc.add_vline(x=0, line_dash="dash", line_color="red", annotation_text="Loss < | > Profit", annotation_position="top left")
-                fig_mc.update_layout(
-                    title="Distribution of Potential Financial Outcomes",
-                    xaxis_title=f"Net Present Value ({currency_symbol})",
-                    yaxis_title="Number of Simulated Outcomes",
-                    showlegend=False,
-                    plot_bgcolor='rgba(0,0,0,0)',
-                    paper_bgcolor='rgba(0,0,0,0)',
-                    margin=dict(l=0, r=0, t=40, b=0)
-                )
-                st.plotly_chart(fig_mc, use_container_width=True)
 
+        st.session_state[f"scenario_label_{scenario_key}"] = f"{display_role} in {country}"
         return cash_flows, f"{display_role} in {country}"
 
     with sub_tab_a:

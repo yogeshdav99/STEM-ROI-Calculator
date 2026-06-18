@@ -1,16 +1,16 @@
-# 🎓 STEM ROI Calculator: Advanced Educational Investment Dashboard
+# STEM ROI Calculator: Advanced Educational Investment Dashboard
 
 ![Python](https://img.shields.io/badge/Python-3.9%2B-blue?logo=python&logoColor=white)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.28%2B-FF4B4B?logo=streamlit&logoColor=white)
 ![Pandas](https://img.shields.io/badge/Pandas-Data_Engineering-150458?logo=pandas&logoColor=white)
 ![Plotly](https://img.shields.io/badge/Plotly-Data_Visualization-3F4F75?logo=plotly&logoColor=white)
 
-## 📌 Executive Summary
+## Executive Summary
 The **STEM ROI Calculator** is a Master's-level Business Analytics web application designed to evaluate the true financial footprint and risk-adjusted return on investment (ROI) of international STEM degrees. 
 
 Moving beyond simple deterministic calculators ($A + B = C$), this application utilizes advanced corporate finance methodologies (NPV, IRR) and probabilistic modeling (Monte Carlo Simulations) to help prospective students stress-test multi-thousand dollar educational investments against real-world volatility.
 
-## 🚀 Key Analytics Features
+## Key Analytics Features
 
 * **True Cost & Opportunity Cost Engine:** Calculates both direct out-of-pocket educational expenses and the compounding lost income (opportunity cost) incurred while studying.
 * **Advanced Loan Amortization:** Simulates the "Capitalization Trap" (how study-period and grace-period interest inflates starting balances), origination fee dilution, and variable interest rate shock premiums.
@@ -19,7 +19,7 @@ Moving beyond simple deterministic calculators ($A + B = C$), this application u
 * **Sensitivity Matrix:** Generates two-way data tables testing how sensitive the final NPV is to simultaneous ±10% shifts in starting salary and growth rate assumptions.
 * **Risk Analytics (Monte Carlo Simulation):** Runs 1,000 statistical permutations of career pathways using Normal Distributions to generate a definitive "Probability of Profit."
 
-## 💻 Technical Architecture
+## Technical Architecture
 
 The application is built on a modular, React-inspired Python architecture using Streamlit.
 
@@ -43,7 +43,7 @@ STEM ROI Calculator/
 └── requirements.txt            # Cloud deployment dependencies
 ```
 
-## 🛠️ Local Installation & Usage
+## Local Installation & Usage
 
 To run this project locally on your machine:
 
@@ -63,13 +63,13 @@ To run this project locally on your machine:
    streamlit run app.py
    ```
 
-## 🌍 Live Deployment
+## Live Deployment
 This application is fully optimized for cloud deployment and is currently hosted live on Streamlit Community Cloud.
 
-👉 **View the Live Application Here**
+**View the Live Application Here**
 *(Note: Update this link once you deploy your app to Streamlit Cloud!)*
 
-## 👨‍💻 Author
+## Author
 **Yogesh Patel**  
 *Business Intelligence & Analytics*  
 * LinkedIn

@@ -6,6 +6,9 @@ import numpy as np
 def inject_premium_styles():
     st.markdown("""
     <style>
+        /* FontAwesome for icons */
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
         /* Premium Typography Stack (Fixed icon bug) */
         html, body, p, h1, h2, h3, h4, h5, h6 {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -34,23 +37,25 @@ def inject_premium_styles():
             color: #475569 !important;
         }
         
-        /* Clean Light Cards & Micro-Animations */
+        /* Unified Card Styles for Metrics and Containers */
         [data-testid="stMetric"], [data-testid="stVerticalBlockBorderWrapper"], [data-testid="stExpander"] {
             padding: 1.25rem;
-            background-color: #ffffff !important;
+            background: linear-gradient(135deg, #ffffff 0%, #f4f7fb 50%, #ffffff 100%) !important;
+            background-size: 200% 200% !important;
+            animation: boxGradientBG 8s ease infinite !important;
             border-radius: 12px !important;
-            border: 1px solid #e2e8f0 !important;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
-            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+            transition: transform 0.3s ease, box-shadow 0.3s ease !important;
             max-width: 100%;
             box-sizing: border-box;
+            position: relative;
+            z-index: 1;
+            border: none !important;
         }
-        
-        /* Soft Hover Elevation */
-        [data-testid="stMetric"]:hover, [data-testid="stVerticalBlockBorderWrapper"]:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
-            border-color: #6366f1 !important;
+        @keyframes boxGradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
         
         /* Prevent Long Currency Numbers from Breaking Layout */
@@ -65,25 +70,51 @@ def inject_premium_styles():
         }
         
         .hero-container {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            border-radius: 16px;
-            padding: 3rem 2rem;
-            color: white;
+            position: relative;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(241, 245, 249, 0.8) 100%);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            padding: 1.5rem;
             text-align: center;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            overflow: hidden;
+            z-index: 1;
         }
+        .hero-container::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle at 30% 30%, rgba(99,102,241,0.08) 0%, transparent 40%),
+                        radial-gradient(circle at 70% 70%, rgba(236,72,153,0.08) 0%, transparent 40%);
+            z-index: -1; animation: slowRotate 15s linear infinite;
+        }
+        @keyframes slowRotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Floating Logo Animation */
+        .hero-container img {
+            animation: floatLogo 4s ease-in-out infinite;
+        }
+        @keyframes floatLogo {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+        
         .hero-title {
-            font-size: 3rem;
+            font-size: 2rem;
             font-weight: 800;
             margin-bottom: 0.5rem;
-            color: #ffffff !important;
+            color: #0f172a !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .hero-subtitle {
-            font-size: 1.25rem;
+            font-size: 1rem;
             font-weight: 400;
-            color: #cbd5e1;
+            color: #475569;
         }
+        
         /* Input Box Enhancements */
         div[data-baseweb="input"] > div, 
         div[data-baseweb="select"] > div {
@@ -91,20 +122,244 @@ def inject_premium_styles():
             border: 1px solid #cbd5e1 !important;
             background-color: #ffffff !important;
             color: #0f172a !important;
-            transition: all 0.2s ease !important;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+        }
+        div[data-baseweb="input"] > div:hover, 
+        div[data-baseweb="select"] > div:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05) !important;
         }
         div[data-baseweb="input"] > div:focus-within, 
         div[data-baseweb="select"] > div:focus-within {
             border-color: #6366f1 !important;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3) !important;
+            animation: inputPulse 2s infinite !important;
         }
+        @keyframes inputPulse {
+            0% { box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3); }
+            50% { box-shadow: 0 0 0 5px rgba(99, 102, 241, 0.5); }
+            100% { box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3); }
+        }
+        
+        /* DataFrames & Tables */
+        [data-testid="stDataFrame"], [data-testid="stTable"] {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: cascadeSlideUp 0.6s ease-out both;
+        }
+        [data-testid="stDataFrame"]:hover, [data-testid="stTable"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+        
+        /* Plotly Charts */
+        [data-testid="stPlotlyChart"] {
+            animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+            transition: transform 0.3s ease;
+            border-radius: 12px;
+        }
+        [data-testid="stPlotlyChart"]:hover {
+            transform: scale(1.02);
+        }
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
         /* Smooth Cascade Fade-in Animation for UI Elements */
         @keyframes cascadeSlideUp {
-            0% { opacity: 0; transform: translateY(10px); }
+            0% { opacity: 0; transform: translateY(15px); }
             100% { opacity: 1; transform: translateY(0); }
         }
-        [data-testid="stVerticalBlock"] > div {
-            animation: cascadeSlideUp 0.4s ease-out both;
+        [data-testid="stVerticalBlock"] > div,
+        [data-testid="stMarkdownContainer"],
+        [data-testid="stSlider"] {
+            animation: cascadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        
+        /* Force Equal Height for Columns & Cards */
+        [data-testid="column"] > [data-testid="stVerticalBlock"] {
+            height: 100%;
+        }
+        [data-testid="column"] > [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlockBorderWrapper"] {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Animated Gradient Border Magic */
+        [data-testid="stMetric"]::before, [data-testid="stVerticalBlockBorderWrapper"]::before, [data-testid="stExpander"]::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            padding: 2px; /* Border thickness */
+            background: linear-gradient(270deg, #6366f1, #a855f7, #ec4899, #6366f1);
+            background-size: 200% 200%;
+            animation: gradientBorder 5s ease infinite;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            z-index: -1;
+            opacity: 0.25;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        [data-testid="stMetric"]:hover, [data-testid="stVerticalBlockBorderWrapper"]:hover, [data-testid="stExpander"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+        }
+        [data-testid="stMetric"]:hover::before, [data-testid="stVerticalBlockBorderWrapper"]:hover::before, [data-testid="stExpander"]:hover::before {
+            opacity: 0.8;
+        }
+        @keyframes gradientBorder {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Landing Page Feature Cards */
+        .feature-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            height: 100%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .feature-icon {
+            font-size: 2.5rem;
+            color: #6366f1;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        .feature-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+        .feature-text {
+            font-size: 0.9rem;
+            color: #475569;
+            line-height: 1.5;
+        }
+
+        /* Quick-Start Preview Custom Alert */
+        .preview-alert {
+            background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+            border-left: 5px solid #6366f1;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: transform 0.2s ease;
+        }
+        .preview-alert:hover { transform: scale(1.01); }
+        .preview-icon {
+            font-size: 1.5rem; background: #ffffff; width: 50px; height: 50px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); flex-shrink: 0;
+        }
+        .preview-content h4 { margin: 0 0 0.25rem 0 !important; color: #3730a3 !important; font-size: 1.05rem !important; font-weight: 800 !important; }
+        .preview-content p { margin: 0 !important; color: #4338ca !important; font-size: 0.9rem !important; line-height: 1.5 !important; }
+        .highlight-badge {
+            background: #ef4444; color: white; padding: 0.15rem 0.5rem; border-radius: 6px; font-weight: 800; font-size: 0.9rem; display: inline-block; transform: rotate(-2deg);
+        }
+        
+        /* Primary Button Pulse Animation */
+        [data-testid="baseButton-primary"] {
+            animation: pulse-primary 2s infinite !important;
+            transition: transform 0.2s ease !important;
+        }
+        [data-testid="baseButton-primary"]:hover {
+            transform: scale(1.05) !important;
+        }
+        @keyframes pulse-primary {
+            0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.6); }
+            70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+        }
+        
+        /* Professional Single-Bar Navigation Menu */
+        div.element-container:has(.top-nav-anchor) + div.element-container {
+            position: sticky;
+            top: 2.875rem;
+            z-index: 999;
+        }
+        
+        div.element-container:has(.top-nav-anchor) + div.element-container [data-testid="stRadio"] > div[role="radiogroup"] {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 0.4rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            gap: 0.4rem;
+        }
+        
+        div.element-container:has(.top-nav-anchor) + div.element-container [data-testid="stRadio"] > div[role="radiogroup"] > label {
+            background-color: transparent;
+            border: none;
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: none;
+            flex: 1;
+            margin: 0;
+        }
+        
+        /* Hide default Streamlit radio circle */
+        div.element-container:has(.top-nav-anchor) + div.element-container [data-testid="stRadio"] > div[role="radiogroup"] > label > div:first-child {
+            display: none;
+        }
+        
+        /* Nav Item Text */
+        div.element-container:has(.top-nav-anchor) + div.element-container [data-testid="stRadio"] > div[role="radiogroup"] > label p {
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #64748b;
+            z-index: 2;
+            transition: color 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        /* Hover Effect */
+        div.element-container:has(.top-nav-anchor) + div.element-container [data-testid="stRadio"] > div[role="radiogroup"] > label:hover {
+            background-color: #f8fafc;
+        }
+        div.element-container:has(.top-nav-anchor) + div.element-container [data-testid="stRadio"] > div[role="radiogroup"] > label:hover p {
+            color: #1e293b;
+        }
+        
+        /* Active (Selected) Effect */
+        div.element-container:has(.top-nav-anchor) + div.element-container [data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) {
+            background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.25);
+        }
+        div.element-container:has(.top-nav-anchor) + div.element-container [data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) p {
+            color: #ffffff !important; font-weight: 700; letter-spacing: 0.5px;
         }
     </style>
     """, unsafe_allow_html=True)
@@ -325,19 +580,54 @@ def build_currency_config(symbol: str, exchange_rate: float, rounding: dict[str,
     return config
 
 @st.cache_data(ttl=86_400)
-def fetch_live_exchange_rates() -> dict[str, float]:
-    fallbacks = {"USD": 1.0, "INR": 83.5, "NZD": 1.65, "EUR": 0.92, "GBP": 0.79}
+def fetch_live_exchange_rates() -> dict:
+    fallbacks = {
+        "_last_updated": "Offline (Using Fallbacks)",
+        "USD": 1.0, "INR": 83.5, "NZD": 1.65, "EUR": 0.92, "GBP": 0.79,
+        "PKR": 278.0, "JPY": 150.0, "CNY": 7.2, "KRW": 1350.0,
+        "SAR": 3.75, "MYR": 4.7, "VND": 25000.0, "IRR": 42000.0
+    }
     try:
         response = requests.get("https://api.frankfurter.dev/v1/latest?base=USD", timeout=5)
         response.raise_for_status()
-        rates = response.json().get("rates", {})
-        return {"USD": 1.0, "INR": rates.get("INR", fallbacks["INR"]), "NZD": rates.get("NZD", fallbacks["NZD"]), "EUR": rates.get("EUR", fallbacks["EUR"]), "GBP": rates.get("GBP", fallbacks["GBP"])}
+        data = response.json()
+        rates = data.get("rates", {})
+        return {
+            "_last_updated": data.get("date", "Recently"),
+            "USD": 1.0, 
+            "INR": rates.get("INR", fallbacks["INR"]), 
+            "NZD": rates.get("NZD", fallbacks["NZD"]), 
+            "EUR": rates.get("EUR", fallbacks["EUR"]), 
+            "GBP": rates.get("GBP", fallbacks["GBP"]),
+            "PKR": rates.get("PKR", fallbacks["PKR"]),
+            "JPY": rates.get("JPY", fallbacks["JPY"]),
+            "CNY": rates.get("CNY", fallbacks["CNY"]),
+            "KRW": rates.get("KRW", fallbacks["KRW"]),
+            "SAR": rates.get("SAR", fallbacks["SAR"]),
+            "MYR": rates.get("MYR", fallbacks["MYR"]),
+            "VND": rates.get("VND", fallbacks["VND"]),
+            "IRR": rates.get("IRR", fallbacks["IRR"])
+        }
     except Exception:
         return fallbacks
 
 LIVE_RATES = fetch_live_exchange_rates()
-CURRENCY_CONFIGS = {"USD ($)": build_currency_config("$", LIVE_RATES["USD"], {"tuition": 1_000, "living": 500, "salary": 5_000}), "INR (₹)": build_currency_config("₹", LIVE_RATES["INR"], {"tuition": 50_000, "living": 25_000, "salary": 100_000}), "NZD (NZ$)": build_currency_config("NZ$", LIVE_RATES["NZD"], {"tuition": 1_000, "living": 500, "salary": 5_000}), "EUR (€)": build_currency_config("€", LIVE_RATES["EUR"], {"tuition": 1_000, "living": 500, "salary": 2_000}), "GBP (£)": build_currency_config("£", LIVE_RATES["GBP"], {"tuition": 1_000, "living": 500, "salary": 2_000})}
+CURRENCY_CONFIGS = {
+    "USD ($)": build_currency_config("$", LIVE_RATES["USD"], {"tuition": 1_000, "living": 500, "salary": 5_000}), 
+    "INR (₹)": build_currency_config("₹", LIVE_RATES["INR"], {"tuition": 50_000, "living": 25_000, "salary": 100_000}), 
+    "NZD (NZ$)": build_currency_config("NZ$", LIVE_RATES["NZD"], {"tuition": 1_000, "living": 500, "salary": 5_000}), 
+    "EUR (€)": build_currency_config("€", LIVE_RATES["EUR"], {"tuition": 1_000, "living": 500, "salary": 2_000}), 
+    "GBP (£)": build_currency_config("£", LIVE_RATES["GBP"], {"tuition": 1_000, "living": 500, "salary": 2_000}),
+    "PKR (₨)": build_currency_config("₨", LIVE_RATES["PKR"], {"tuition": 100_000, "living": 50_000, "salary": 200_000}),
+    "JPY (¥)": build_currency_config("¥", LIVE_RATES["JPY"], {"tuition": 100_000, "living": 50_000, "salary": 100_000}),
+    "CNY (¥)": build_currency_config("¥", LIVE_RATES["CNY"], {"tuition": 10_000, "living": 5_000, "salary": 10_000}),
+    "KRW (₩)": build_currency_config("₩", LIVE_RATES["KRW"], {"tuition": 1_000_000, "living": 500_000, "salary": 2_000_000}),
+    "SAR (﷼)": build_currency_config("﷼", LIVE_RATES["SAR"], {"tuition": 5_000, "living": 2_500, "salary": 10_000}),
+    "MYR (RM)": build_currency_config("RM", LIVE_RATES["MYR"], {"tuition": 5_000, "living": 2_500, "salary": 10_000}),
+    "VND (₫)": build_currency_config("₫", LIVE_RATES["VND"], {"tuition": 10_000_000, "living": 5_000_000, "salary": 20_000_000}),
+    "IRR (﷼)": build_currency_config("﷼", LIVE_RATES["IRR"], {"tuition": 10_000_000, "living": 5_000_000, "salary": 20_000_000})
+}
 def local_to_usd(amount: float, exchange_rate: float) -> float: 
     if exchange_rate <= 0: return amount # Prevent ZeroDivisionError fallback
     return amount / exchange_rate
-def format_currency_markdown(symbol: str, amount: float) -> str: return f"{symbol.replace('$', r'\$')}{amount:,.2f}"
+def format_currency_markdown(symbol: str, amount: float) -> str: return f"{symbol.replace('$', r'\$')}{amount:,.0f}"
