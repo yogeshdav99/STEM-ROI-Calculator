@@ -16,7 +16,7 @@ Moving beyond simple deterministic calculators ($A + B = C$), this application u
 * **Advanced Loan Amortization:** Simulates the "Capitalization Trap" (how study-period and grace-period interest inflates starting balances), origination fee dilution, and variable interest rate shock premiums.
 * **Data-Driven Career Forecaster:** Maps dynamic, real-world starting salaries based on degree level and geographic market, cross-referencing reliable datasets.
 * **Corporate Finance Valuation (NPV & IRR):** Calculates 10-year Net Present Value (NPV), precise Break-Even Horizons, and the Internal Rate of Return (IRR) of the degree asset.
-* **McKinsey-Style Sensitivity Matrix:** Generates two-way data tables testing how sensitive the final NPV is to simultaneous ±10% shifts in starting salary and growth rate assumptions.
+* **Sensitivity Matrix:** Generates two-way data tables testing how sensitive the final NPV is to simultaneous ±10% shifts in starting salary and growth rate assumptions.
 * **Risk Analytics (Monte Carlo Simulation):** Runs 1,000 statistical permutations of career pathways using Normal Distributions to generate a definitive "Probability of Profit."
 
 ## 💻 Technical Architecture
