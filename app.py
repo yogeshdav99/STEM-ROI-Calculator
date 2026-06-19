@@ -29,6 +29,61 @@ if "show_profile" not in st.session_state:
 if "dark_mode" not in st.session_state:
     st.session_state.dark_mode = False
 
+# --- PERSISTENT USER INPUTS IN USD ---
+if "tuition_usd" not in st.session_state:
+    st.session_state.tuition_usd = 0.0
+if "schol_usd" not in st.session_state:
+    st.session_state.schol_usd = 0.0
+if "living_usd" not in st.session_state:
+    st.session_state.living_usd = 0.0
+if "employment_status" not in st.session_state:
+    st.session_state.employment_status = "I am a Student / Not Employed"
+if "current_salary_usd" not in st.session_state:
+    st.session_state.current_salary_usd = 0.0
+if "salary_growth" not in st.session_state:
+    st.session_state.salary_growth = 3.0
+
+# Loan inputs
+if "loan_amount_usd" not in st.session_state:
+    st.session_state.loan_amount_usd = 0.0
+if "custom_payment_usd" not in st.session_state:
+    st.session_state.custom_payment_usd = 0.0
+if "loan_interest_rate" not in st.session_state:
+    st.session_state.loan_interest_rate = 6.5
+if "target_repayment_years" not in st.session_state:
+    st.session_state.target_repayment_years = 10
+if "origination_fee" not in st.session_state:
+    st.session_state.origination_fee = 1.5
+if "grace_period_months" not in st.session_state:
+    st.session_state.grace_period_months = 6
+
+# Prepayment inputs
+if "extra_monthly_payment_usd" not in st.session_state:
+    st.session_state.extra_monthly_payment_usd = 0.0
+if "lump_sum_payment_usd" not in st.session_state:
+    st.session_state.lump_sum_payment_usd = 0.0
+if "lump_sum_year" not in st.session_state:
+    st.session_state.lump_sum_year = 3
+
+# Career inputs
+for scenario in ["A", "B"]:
+    if f"deg_{scenario}" not in st.session_state:
+        st.session_state[f"deg_{scenario}"] = "Master's"
+    if f"stream_{scenario}" not in st.session_state:
+        st.session_state[f"stream_{scenario}"] = None
+    if f"role_{scenario}" not in st.session_state:
+        st.session_state[f"role_{scenario}"] = None
+    if f"country_{scenario}" not in st.session_state:
+        st.session_state[f"country_{scenario}"] = "USA" if scenario == "A" else "Canada"
+    if f"salary_usd_{scenario}" not in st.session_state:
+        st.session_state[f"salary_usd_{scenario}"] = 0.0
+    if f"growth_rate_{scenario}" not in st.session_state:
+        st.session_state[f"growth_rate_{scenario}"] = 4.0
+if "discount_rate" not in st.session_state:
+    st.session_state.discount_rate = 7.0
+if "post_grad_living_factor" not in st.session_state:
+    st.session_state.post_grad_living_factor = 1.5
+
 # --- SIDEBAR — Clean Global Settings ---
 st.sidebar.markdown("#### ⚙️ Settings")
 
@@ -48,6 +103,25 @@ currency_choice = st.sidebar.selectbox(
 currency_config = CURRENCY_CONFIGS[currency_choice]
 currency_symbol = currency_config["symbol"]
 exchange_rate = currency_config["exchange_rate"]
+
+# --- Currency Change Detection ---
+if "last_currency" not in st.session_state:
+    st.session_state.last_currency = currency_choice
+
+if st.session_state.last_currency != currency_choice:
+    keys_to_clear = [
+        "w_tuition", "w_schol", "w_living", "w_current_salary", "w_salary_growth",
+        "w_loan_amount", "w_custom_payment", "w_interest_rate", "w_repayment_years",
+        "w_origination_fee", "w_grace_months", "widget_program_duration",
+        "w_extra_monthly_payment", "w_lump_sum_payment", "w_lump_sum_year",
+        "w_discount_rate", "w_post_grad_living_factor"
+    ]
+    for s in ["A", "B"]:
+        keys_to_clear.extend([f"w_salary_{s}", f"w_growth_{s}", f"w_deg_{s}", f"w_stream_{s}", f"w_role_{s}", f"w_country_{s}", f"w_living_factor_{s}"])
+    for key in keys_to_clear:
+        if key in st.session_state:
+            del st.session_state[key]
+    st.session_state.last_currency = currency_choice
 
 st.sidebar.caption(f"1 USD = {exchange_rate:,.2f} {currency_symbol} · Updated: {LIVE_RATES.get('_last_updated', 'Unknown')}")
 
@@ -286,7 +360,8 @@ def render_step_risk():
         return
     tab_risk.render(
         st.session_state.true_economic_cost_local, 
-        currency_symbol
+        currency_symbol,
+        exchange_rate
     )
 
 
