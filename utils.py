@@ -861,8 +861,8 @@ def calculate_capitalized_principal(total_loan: float, annual_rate: float, progr
     total_capitalized_balance = principal_balance + accrued_simple_interest
     return total_capitalized_balance, accrued_simple_interest
 
-def calculate_amortization(principal: float, annual_rate: float, months: int = 120, shock_month: int = 36, shock_rate_increase: float = 2.0, custom_payment: float = 0.0):
-    """Calculates amortization schedules. Handles both standard 10-year terms and custom monthly payments."""
+def calculate_amortization(principal: float, annual_rate: float, months: int = 120, shock_month: int = 36, shock_rate_increase: float = 2.0, custom_payment: float = 0.0, extra_monthly_payment: float = 0.0, lump_sum_payment: float = 0.0, lump_sum_month: int = 0):
+    """Calculates amortization schedules. Handles standard terms, custom payments, and prepayments."""
     if principal <= 0:
         return 0.0, 0.0, 0.0, [0.0], [0.0]
 
@@ -875,21 +875,22 @@ def calculate_amortization(principal: float, annual_rate: float, months: int = 1
         
     actual_payment = custom_payment if custom_payment > 0 else standard_payment
     
-    if actual_payment <= principal * monthly_rate and custom_payment > 0:
+    if (actual_payment + extra_monthly_payment) <= principal * monthly_rate and (custom_payment > 0 or extra_monthly_payment > 0):
         return actual_payment, float('inf'), float('inf'), [principal] * 120, [principal] * 120
         
     baseline_history = []
     balance = principal
     total_baseline_interest = 0.0
-    max_sim_months = 360 if custom_payment > 0 else months
+    max_sim_months = 360 if (custom_payment > 0 or extra_monthly_payment > 0 or lump_sum_payment > 0) else months
     
-    for _ in range(max_sim_months + 1):
+    for m in range(max_sim_months + 1):
         baseline_history.append(balance)
         if balance <= 0:
             break
         interest = balance * monthly_rate
         total_baseline_interest += interest
-        payment = min(actual_payment, balance + interest)
+        lump = lump_sum_payment if m == lump_sum_month else 0.0
+        payment = min(actual_payment + extra_monthly_payment + lump, balance + interest)
         balance -= (payment - interest)
 
     shock_history = []
@@ -906,20 +907,22 @@ def calculate_amortization(principal: float, annual_rate: float, months: int = 1
         if m < shock_month:
             interest = balance * monthly_rate
             total_shock_interest += interest
-            payment = min(actual_payment, balance + interest)
+            lump = lump_sum_payment if m == lump_sum_month else 0.0
+            payment = min(actual_payment + extra_monthly_payment + lump, balance + interest)
             balance -= (payment - interest)
         else:
             interest = balance * shocked_monthly_rate
             total_shock_interest += interest
+            lump = lump_sum_payment if m == lump_sum_month else 0.0
             if custom_payment > 0:
-                payment = min(actual_payment, balance + interest)
+                payment = min(actual_payment + extra_monthly_payment + lump, balance + interest)
             else:
                 remaining_months_at_shock = months - shock_month
                 if shocked_monthly_rate > 0 and remaining_months_at_shock > 0:
                     shocked_payment = balance * (shocked_monthly_rate * (1 + shocked_monthly_rate)**remaining_months_at_shock) / ((1 + shocked_monthly_rate)**remaining_months_at_shock - 1)
                 else:
                     shocked_payment = balance / remaining_months_at_shock if remaining_months_at_shock > 0 else balance + interest
-                payment = min(shocked_payment, balance + interest)
+                payment = min(shocked_payment + extra_monthly_payment + lump, balance + interest)
             balance -= (payment - interest)
 
     extra_interest = max(0.0, total_shock_interest - total_baseline_interest)

@@ -4,6 +4,22 @@ from utils import local_to_usd, format_currency_markdown, calculate_opportunity_
 def render(currency_choice, currency_config, currency_symbol, exchange_rate):
     st.info("💡 **Why does this matter?** Before you take a loan, you need to know exactly how much money you need. But there's a catch: the 'real' cost of a degree isn't just tuition—it's also the salary you give up by going to school instead of working. Let's calculate both.")
     
+    # Initialize widget session state from persistent USD variables if not present
+    if "w_tuition" not in st.session_state:
+        st.session_state.w_tuition = float(st.session_state.tuition_usd * exchange_rate)
+    if "w_schol" not in st.session_state:
+        st.session_state.w_schol = float(st.session_state.schol_usd * exchange_rate)
+    if "w_living" not in st.session_state:
+        st.session_state.w_living = float(st.session_state.living_usd * exchange_rate)
+    if "w_current_salary" not in st.session_state:
+        st.session_state.w_current_salary = float(st.session_state.current_salary_usd * exchange_rate)
+    if "w_salary_growth" not in st.session_state:
+        st.session_state.w_salary_growth = float(st.session_state.salary_growth)
+    if "w_employment_status" not in st.session_state:
+        st.session_state.w_employment_status = st.session_state.employment_status
+    if "widget_program_duration" not in st.session_state:
+        st.session_state.widget_program_duration = float(st.session_state.program_duration)
+
     left_col, right_col = st.columns([1.1, 1], gap="large")
 
     def render_direct_costs():
@@ -12,11 +28,11 @@ def render(currency_choice, currency_config, currency_symbol, exchange_rate):
         
         c1_a, c1_b = st.columns(2)
         with c1_a:
-            tuition = st.number_input("Annual Tuition", min_value=0, value=0, step=int(currency_config["tuition"]["step"]), help=f"The amount you expect to pay per year for tuition in {currency_choice}.")
-            schol = st.number_input("Scholarships / Grants", min_value=0, value=0, step=int(currency_config["tuition"]["step"]), help=f"Enter any scholarships, grants, or institutional aid received per year in {currency_choice}.")
+            tuition = st.number_input("Annual Tuition", min_value=0.0, step=float(currency_config["tuition"]["step"]), key="w_tuition", help=f"The amount you expect to pay per year for tuition in {currency_choice}.")
+            schol = st.number_input("Scholarships / Grants", min_value=0.0, step=float(currency_config["tuition"]["step"]), key="w_schol", help=f"Enter any scholarships, grants, or institutional aid received per year in {currency_choice}.")
         with c1_b:
-            living = st.number_input("Living Expenses", min_value=0, value=0, step=int(currency_config["living"]["step"]), help=f"Rent, food, health insurance, and other necessary living expenses per year in {currency_choice}.")
-            duration = st.number_input("Duration (Years)", min_value=1.0, max_value=4.0, step=0.5, value=float(st.session_state.get("program_duration", 4.0)), key="widget_program_duration", help="Select the total length of your program (e.g., 4 years for Bachelor's, 2 years for Master's).")
+            living = st.number_input("Living Expenses", min_value=0.0, step=float(currency_config["living"]["step"]), key="w_living", help=f"Rent, food, health insurance, and other necessary living expenses per year in {currency_choice}.")
+            duration = st.number_input("Duration (Years)", min_value=1.0, max_value=4.0, step=0.5, key="widget_program_duration", help="Select the total length of your program (e.g., 4 years for Bachelor's, 2 years for Master's).")
         if currency_choice == "INR (₹)":
             st.info("**Indian Student Alert:** When transferring money abroad, remember the government applies a 5% TCS (Tax Collected at Source) on education remittances above ₹7 Lakhs. Also, expect the Rupee to depreciate ~3-5% yearly against foreign currencies, making your second year slightly more expensive!")
         return tuition, schol, living, duration
@@ -25,7 +41,13 @@ def render(currency_choice, currency_config, currency_symbol, exchange_rate):
         st.header("The Real Price Tag")
         st.markdown(f"Let's calculate the absolute real cost of your degree in **{currency_choice}**.")
 
-        employment_status = st.radio("Current Employment Status:", options=["I am a Student / Not Employed", "I am a Working Professional"], horizontal=True)
+        emp_options = ["I am a Student / Not Employed", "I am a Working Professional"]
+        try:
+            emp_index = emp_options.index(st.session_state.w_employment_status)
+        except ValueError:
+            emp_index = 0
+
+        employment_status = st.radio("Current Employment Status:", options=emp_options, index=emp_index, horizontal=True, key="w_employment_status")
         st.divider()
         
         if employment_status == "I am a Working Professional":
@@ -35,14 +57,23 @@ def render(currency_choice, currency_config, currency_symbol, exchange_rate):
                 st.markdown(f"#### 2. The Income You're Giving Up ({currency_symbol})")
                 st.markdown("*(If you study, you can't work full-time. This missed salary is a hidden cost of your degree.)*")
                 c2_a, c2_b = st.columns(2)
-                with c2_a: current_salary = st.number_input("Current Salary", min_value=0, value=0, step=int(currency_config["salary"]["step"]), help=f"Your current or expected annual salary in {currency_choice}. This is the income you give up while studying.")
-                with c2_b: salary_growth = st.number_input("Expected Raise (%)", min_value=0.0, value=3.0, step=0.5, help="The estimated annual raise percentage you would receive if you stayed at your current job.")
+                with c2_a: current_salary = st.number_input("Current Salary", min_value=0.0, step=float(currency_config["salary"]["step"]), key="w_current_salary", help=f"Your current or expected annual salary in {currency_choice}. This is the income you give up while studying.")
+                with c2_b: salary_growth = st.number_input("Expected Raise (%)", min_value=0.0, step=0.5, key="w_salary_growth", help="The estimated annual raise percentage you would receive if you stayed at your current job.")
         else:
             st.success("🎉 **Student Advantage:** Since you are currently a student, you aren't leaving a full-time job. This means your 'hidden cost of lost salary' is zero!")
             with st.container(border=True):
                 annual_tuition, scholarship, annual_living_expenses, program_duration = render_direct_costs()
             current_salary = 0.0
             salary_growth = 3.0
+
+    # Save inputs back to persistent session state (converted to USD)
+    st.session_state.tuition_usd = float(annual_tuition / exchange_rate) if exchange_rate > 0 else 0.0
+    st.session_state.schol_usd = float(scholarship / exchange_rate) if exchange_rate > 0 else 0.0
+    st.session_state.living_usd = float(annual_living_expenses / exchange_rate) if exchange_rate > 0 else 0.0
+    st.session_state.program_duration = float(program_duration)
+    st.session_state.employment_status = employment_status
+    st.session_state.current_salary_usd = float(current_salary / exchange_rate) if exchange_rate > 0 else 0.0
+    st.session_state.salary_growth = float(salary_growth)
 
     annual_tuition_usd = local_to_usd(annual_tuition, exchange_rate)
     annual_living_expenses_usd = local_to_usd(annual_living_expenses, exchange_rate)

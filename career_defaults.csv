@@ -1,5 +1,25 @@
-Job_Title,Degree_Level,Starting_Salary_USD,Source_Name,Source_URL
-Data Scientist,Master's,105000,Glassdoor,https://www.glassdoor.com/Salaries/data-scientist-salary-SRCH_KO0,14.htm
-Software Engineer,Master's,115000,Levels.fyi,https://www.levels.fyi/
-Mechanical Engineer,Master's,85000,BLS.gov,https://www.bls.gov/ooh/architecture-and-engineering/mechanical-engineers.htm
-Business Analyst,Master's,80000,Glassdoor,https://www.glassdoor.com/Salaries/business-analyst-salary-SRCH_KO0,16.htm
+Job_Title,Degree_Level,Country,Starting_Salary_USD,Source_Name,Source_URL
+Data Scientist,Master's,USA,105000,Glassdoor,https://www.glassdoor.com/Salaries/data-scientist-salary-SRCH_KO0,14.htm
+Software Engineer,Master's,USA,115000,Levels.fyi,https://www.levels.fyi/
+Mechanical Engineer,Master's,USA,85000,BLS.gov,https://www.bls.gov/ooh/architecture-and-engineering/mechanical-engineers.htm
+Business Analyst,Master's,USA,80000,Glassdoor,https://www.glassdoor.com/Salaries/business-analyst-salary-SRCH_KO0,16.htm
+Data Scientist,Master's,UK,65000,Glassdoor,https://www.glassdoor.co.uk
+Software Engineer,Master's,UK,75000,Levels.fyi,https://www.levels.fyi/
+Mechanical Engineer,Master's,UK,55000,Glassdoor,https://www.glassdoor.co.uk
+Business Analyst,Master's,UK,50000,Glassdoor,https://www.glassdoor.co.uk
+Data Scientist,Master's,Canada,80000,Glassdoor,https://www.glassdoor.ca
+Software Engineer,Master's,Canada,90000,Levels.fyi,https://www.levels.fyi/
+Mechanical Engineer,Master's,Canada,70000,Glassdoor,https://www.glassdoor.ca
+Business Analyst,Master's,Canada,65000,Glassdoor,https://www.glassdoor.ca
+Data Scientist,Master's,Australia,95000,Glassdoor,https://www.glassdoor.com.au
+Software Engineer,Master's,Australia,105000,Levels.fyi,https://www.levels.fyi/
+Mechanical Engineer,Master's,Australia,80000,Glassdoor,https://www.glassdoor.com.au
+Business Analyst,Master's,Australia,75000,Glassdoor,https://www.glassdoor.com.au
+Data Scientist,Master's,Germany,70000,Glassdoor,https://www.glassdoor.de
+Software Engineer,Master's,Germany,75000,Levels.fyi,https://www.levels.fyi/
+Mechanical Engineer,Master's,Germany,65000,Glassdoor,https://www.glassdoor.de
+Business Analyst,Master's,Germany,60000,Glassdoor,https://www.glassdoor.de
+Data Scientist,Master's,New Zealand,80000,Glassdoor,https://www.glassdoor.co.nz
+Software Engineer,Master's,New Zealand,85000,Levels.fyi,https://www.levels.fyi/
+Mechanical Engineer,Master's,New Zealand,75000,Glassdoor,https://www.glassdoor.co.nz
+Business Analyst,Master's,New Zealand,70000,Glassdoor,https://www.glassdoor.co.nz
