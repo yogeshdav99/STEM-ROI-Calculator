@@ -2,10 +2,13 @@ import streamlit as st
 from utils import local_to_usd, format_currency_markdown, calculate_opportunity_cost
 
 def render(currency_choice, currency_config, currency_symbol, exchange_rate):
+    st.info("💡 **Why does this matter?** Before you take a loan, you need to know exactly how much money you need. But there's a catch: the 'real' cost of a degree isn't just tuition—it's also the salary you give up by going to school instead of working. Let's calculate both.")
+    
     left_col, right_col = st.columns([1.1, 1], gap="large")
 
     def render_direct_costs():
-        st.markdown(f"#### Direct Out-of-Pocket Costs ({currency_symbol})")
+        st.markdown(f"#### 1. What You Will Actually Pay ({currency_symbol})")
+        st.markdown("*(The out-of-pocket expenses)*")
         
         c1_a, c1_b = st.columns(2)
         with c1_a:
@@ -13,14 +16,14 @@ def render(currency_choice, currency_config, currency_symbol, exchange_rate):
             schol = st.number_input("Scholarships / Grants", min_value=0, value=0, step=int(currency_config["tuition"]["step"]), help=f"Enter any scholarships, grants, or institutional aid received per year in {currency_choice}.")
         with c1_b:
             living = st.number_input("Living Expenses", min_value=0, value=0, step=int(currency_config["living"]["step"]), help=f"Rent, food, health insurance, and other necessary living expenses per year in {currency_choice}.")
-            duration = st.number_input("Duration (Years)", min_value=1.0, max_value=4.0, step=0.5, key="program_duration", help="Select the total length of your program (e.g., 4 years for Bachelor's, 2 years for Master's).")
+            duration = st.number_input("Duration (Years)", min_value=1.0, max_value=4.0, step=0.5, value=float(st.session_state.get("program_duration", 4.0)), key="widget_program_duration", help="Select the total length of your program (e.g., 4 years for Bachelor's, 2 years for Master's).")
         if currency_choice == "INR (₹)":
             st.info("**Indian Student Alert:** When transferring money abroad, remember the government applies a 5% TCS (Tax Collected at Source) on education remittances above ₹7 Lakhs. Also, expect the Rupee to depreciate ~3-5% yearly against foreign currencies, making your second year slightly more expensive!")
         return tuition, schol, living, duration
 
     with left_col:
-        st.header("Your True Cost of Studying")
-        st.markdown(f"Calculate the real cost of your degree, including what you pay out-of-pocket and the salary you give up by choosing to study instead of work in **{currency_choice}**.")
+        st.header("The Real Price Tag")
+        st.markdown(f"Let's calculate the absolute real cost of your degree in **{currency_choice}**.")
 
         employment_status = st.radio("Current Employment Status:", options=["I am a Student / Not Employed", "I am a Working Professional"], horizontal=True)
         st.divider()
@@ -29,13 +32,13 @@ def render(currency_choice, currency_config, currency_symbol, exchange_rate):
             with st.container(border=True):
                 annual_tuition, scholarship, annual_living_expenses, program_duration = render_direct_costs()
             with st.container(border=True):
-                st.markdown(f"#### Lost Income / Opportunity Cost ({currency_symbol})")
-                st.markdown("*(If you don't currently have a job, leave these at zero!)*")
+                st.markdown(f"#### 2. The Income You're Giving Up ({currency_symbol})")
+                st.markdown("*(If you study, you can't work full-time. This missed salary is a hidden cost of your degree.)*")
                 c2_a, c2_b = st.columns(2)
                 with c2_a: current_salary = st.number_input("Current Salary", min_value=0, value=0, step=int(currency_config["salary"]["step"]), help=f"Your current or expected annual salary in {currency_choice}. This is the income you give up while studying.")
                 with c2_b: salary_growth = st.number_input("Expected Raise (%)", min_value=0.0, value=3.0, step=0.5, help="The estimated annual raise percentage you would receive if you stayed at your current job.")
         else:
-            st.info("**Student Advantage:** Since you are a student, we will automatically skip the Opportunity Cost (Lost Salary) calculations!")
+            st.success("🎉 **Student Advantage:** Since you are currently a student, you aren't leaving a full-time job. This means your 'hidden cost of lost salary' is zero!")
             with st.container(border=True):
                 annual_tuition, scholarship, annual_living_expenses, program_duration = render_direct_costs()
             current_salary = 0.0
@@ -58,7 +61,7 @@ def render(currency_choice, currency_config, currency_symbol, exchange_rate):
     true_economic_cost_local = true_economic_cost_usd * exchange_rate
 
     with right_col:
-        st.markdown(f"### Cost Projection Summary ({currency_choice})")
+        st.markdown(f"### The Final Math ({currency_choice})")
         metric_col1, metric_col2 = st.columns(2)
 
         with metric_col1:
@@ -81,10 +84,12 @@ def render(currency_choice, currency_config, currency_symbol, exchange_rate):
 
         st.divider()
         if current_salary > 0:
-            st.markdown("### Strategic Takeaway")
-            st.error(f"**Out-of-Pocket Cost:** You will actually need to pay **{format_currency_markdown(currency_symbol, total_direct_cost_local)}** for your tuition and living expenses.")
-            st.warning(f"**Your Break-Even Goal:** For this degree to be worth it financially, your new job must help you recover a total value of **{format_currency_markdown(currency_symbol, true_economic_cost_local)}** over what your old job would have paid.")
+            st.markdown("### The Verdict")
+            st.error(f"**What you pay the university:** You need exactly **{format_currency_markdown(currency_symbol, total_direct_cost_local)}** in cash or loans to pay for this degree.")
+            st.warning(f"**What your degree needs to earn:** Because you are giving up your current salary, this degree is only 'worth it' if your new job pays you back at least **{format_currency_markdown(currency_symbol, true_economic_cost_local)}** over time.")
         else:
-            st.success(f"**Student Advantage:** Your financial target to achieve a positive return is strictly limited to clearing your out-of-pocket direct expenses: **{format_currency_markdown(currency_symbol, total_direct_cost_local)}**.")
+            st.markdown("### The Verdict")
+            st.success(f"**What you pay the university:** You need exactly **{format_currency_markdown(currency_symbol, total_direct_cost_local)}** in cash or loans to pay for this degree.")
+            st.info(f"**What your degree needs to earn:** Your new job only needs to pay back the **{format_currency_markdown(currency_symbol, total_direct_cost_local)}** you spent, since you didn't give up a salary to study.")
 
     return total_direct_cost_local, true_economic_cost_local, program_duration
